@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.maolian.dao.HsrBolckDao" >
+  <resultMap id="BaseResultMap" type="com.maolian.entity.HsrBlock" >
+    <id column="hash" property="hash" jdbcType="VARCHAR" />
+    <result column="confirmations" property="confirmations" jdbcType="BIGINT" />
+    <result column="size" property="size" jdbcType="BIGINT" />
+    <result column="height" property="height" jdbcType="BIGINT" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="merkleroot" property="merkleroot" jdbcType="VARCHAR" />
+    <result column="mint" property="mint" jdbcType="DECIMAL" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="nonce" property="nonce" jdbcType="BIGINT" />
+    <result column="bits" property="bits" jdbcType="VARCHAR" />
+    <result column="difficulty" property="difficulty" jdbcType="DECIMAL" />
+    <result column="blocktrust" property="blocktrust" jdbcType="VARCHAR" />
+    <result column="chaintrust" property="chaintrust" jdbcType="VARCHAR" />
+    <result column="previousblockhash" property="previousblockhash" jdbcType="VARCHAR" />
+    <result column="nextblockhash" property="nextblockhash" jdbcType="VARCHAR" />
+    <result column="flags" property="flags" jdbcType="VARCHAR" />
+    <result column="proofhash" property="proofhash" jdbcType="VARCHAR" />
+    <result column="entropybit" property="entropybit" jdbcType="BIGINT" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="modifierv2" property="modifierv2" jdbcType="VARCHAR" />
+    <result column="signature" property="signature" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    hash, confirmations, size, height, version, merkleroot, mint, time, nonce, bits, 
+    difficulty, blocktrust, chaintrust, previousblockhash, nextblockhash, flags, proofhash, 
+    entropybit, modifier, modifierv2, signature
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.maolian.entity.HsrBlockExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from hsr_block
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from hsr_block
+    where hash = #{hash,jdbcType=VARCHAR}
+  </select>
+
+  <select id="findTxListByParam" parameterType="map" resultType="map">
+    select y.*,count(y1.address) inAddress from (
+    select
+    t.txid,t.version,t.time,t.locktime,t.blockhash,t.tx_amount
+    from hsr_transaction t
+    where 1=1
+    <include refid="searchByParam"/>
+    order by t.time desc
+    <if test="startIndex != null and pageSize != null">
+      LIMIT #{startIndex},#{pageSize}
+    </if>
+    ) y left join hsr_tx_vout y1
+    on y.txid=y1.txid
+
+  </select>
+
+  <select id="findTxListByParamByCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*)
+    from hsr_transaction t
+    where 1=1
+    <include refid="searchByParam" />
+
+  </select>
+
+
+  <sql id="searchByParam">
+    <if test="searchStr!=null and searchStr!=''">
+       and (t.blockhash  like CONCAT('%',#{searchStr,jdbcType=VARCHAR},'%') or t.txid like CONCAT('%',#{searchStr,jdbcType=VARCHAR},'%'))
+    </if>
+  </sql>
+  <select id="findTxById" parameterType="java.lang.String" resultType="map">
+     select t.txid,t.blockhash,t.time,t.locktime
+       from hsr_transaction t where t.txid=#{hashStr,jdbcType=VARCHAR}
+    </select>
+
+   <!-- 获取收件人信息  -->
+  <select id="findTxOut" parameterType="java.lang.String" resultType="map">
+    select t1.value,t1.address
+    from hsr_transaction t,hsr_tx_vout t1  where t.txid=t1.txid and  t.txid=#{idStr,jdbcType=VARCHAR}
+  </select>
+  <!-- 获取输入人信息  -->
+  <select id="findTxIn" parameterType="java.lang.String" resultType="map">
+   select y1.value,y1.address from ( select t1.parent_txid,t1.vout
+    from hsr_transaction t,hsr_tx_vin t1 where t.txid=t1.txid and  t.txid=#{idStr,jdbcType=VARCHAR}
+    ) y,hsr_tx_vout y1 where y.parent_txid=y1.txid and y.vout=y1.n
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from hsr_block
+    where hash = #{hash,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.maolian.entity.HsrBlockExample" >
+    delete from hsr_block
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.maolian.entity.HsrBlock" >
+    insert into hsr_block (hash, confirmations, size, 
+      height, version, merkleroot, 
+      mint, time, nonce, 
+      bits, difficulty, blocktrust, 
+      chaintrust, previousblockhash, nextblockhash, 
+      flags, proofhash, entropybit, 
+      modifier, modifierv2, signature
+      )
+    values (#{hash,jdbcType=VARCHAR}, #{confirmations,jdbcType=BIGINT}, #{size,jdbcType=BIGINT}, 
+      #{height,jdbcType=BIGINT}, #{version,jdbcType=BIGINT}, #{merkleroot,jdbcType=VARCHAR}, 
+      #{mint,jdbcType=DECIMAL}, #{time,jdbcType=TIMESTAMP}, #{nonce,jdbcType=BIGINT}, 
+      #{bits,jdbcType=VARCHAR}, #{difficulty,jdbcType=DECIMAL}, #{blocktrust,jdbcType=VARCHAR}, 
+      #{chaintrust,jdbcType=VARCHAR}, #{previousblockhash,jdbcType=VARCHAR}, #{nextblockhash,jdbcType=VARCHAR}, 
+      #{flags,jdbcType=VARCHAR}, #{proofhash,jdbcType=VARCHAR}, #{entropybit,jdbcType=BIGINT}, 
+      #{modifier,jdbcType=VARCHAR}, #{modifierv2,jdbcType=VARCHAR}, #{signature,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.maolian.entity.HsrBlock" >
+    insert into hsr_block
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="hash != null" >
+        hash,
+      </if>
+      <if test="confirmations != null" >
+        confirmations,
+      </if>
+      <if test="size != null" >
+        size,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="merkleroot != null" >
+        merkleroot,
+      </if>
+      <if test="mint != null" >
+        mint,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="nonce != null" >
+        nonce,
+      </if>
+      <if test="bits != null" >
+        bits,
+      </if>
+      <if test="difficulty != null" >
+        difficulty,
+      </if>
+      <if test="blocktrust != null" >
+        blocktrust,
+      </if>
+      <if test="chaintrust != null" >
+        chaintrust,
+      </if>
+      <if test="previousblockhash != null" >
+        previousblockhash,
+      </if>
+      <if test="nextblockhash != null" >
+        nextblockhash,
+      </if>
+      <if test="flags != null" >
+        flags,
+      </if>
+      <if test="proofhash != null" >
+        proofhash,
+      </if>
+      <if test="entropybit != null" >
+        entropybit,
+      </if>
+      <if test="modifier != null" >
+        modifier,
+      </if>
+      <if test="modifierv2 != null" >
+        modifierv2,
+      </if>
+      <if test="signature != null" >
+        signature,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="hash != null" >
+        #{hash,jdbcType=VARCHAR},
+      </if>
+      <if test="confirmations != null" >
+        #{confirmations,jdbcType=BIGINT},
+      </if>
+      <if test="size != null" >
+        #{size,jdbcType=BIGINT},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=BIGINT},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=BIGINT},
+      </if>
+      <if test="merkleroot != null" >
+        #{merkleroot,jdbcType=VARCHAR},
+      </if>
+      <if test="mint != null" >
+        #{mint,jdbcType=DECIMAL},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="nonce != null" >
+        #{nonce,jdbcType=BIGINT},
+      </if>
+      <if test="bits != null" >
+        #{bits,jdbcType=VARCHAR},
+      </if>
+      <if test="difficulty != null" >
+        #{difficulty,jdbcType=DECIMAL},
+      </if>
+      <if test="blocktrust != null" >
+        #{blocktrust,jdbcType=VARCHAR},
+      </if>
+      <if test="chaintrust != null" >
+        #{chaintrust,jdbcType=VARCHAR},
+      </if>
+      <if test="previousblockhash != null" >
+        #{previousblockhash,jdbcType=VARCHAR},
+      </if>
+      <if test="nextblockhash != null" >
+        #{nextblockhash,jdbcType=VARCHAR},
+      </if>
+      <if test="flags != null" >
+        #{flags,jdbcType=VARCHAR},
+      </if>
+      <if test="proofhash != null" >
+        #{proofhash,jdbcType=VARCHAR},
+      </if>
+      <if test="entropybit != null" >
+        #{entropybit,jdbcType=BIGINT},
+      </if>
+      <if test="modifier != null" >
+        #{modifier,jdbcType=VARCHAR},
+      </if>
+      <if test="modifierv2 != null" >
+        #{modifierv2,jdbcType=VARCHAR},
+      </if>
+      <if test="signature != null" >
+        #{signature,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.maolian.entity.HsrBlockExample" resultType="java.lang.Integer" >
+    select count(*) from hsr_block
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update hsr_block
+    <set >
+      <if test="record.hash != null" >
+        hash = #{record.hash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.confirmations != null" >
+        confirmations = #{record.confirmations,jdbcType=BIGINT},
+      </if>
+      <if test="record.size != null" >
+        size = #{record.size,jdbcType=BIGINT},
+      </if>
+      <if test="record.height != null" >
+        height = #{record.height,jdbcType=BIGINT},
+      </if>
+      <if test="record.version != null" >
+        version = #{record.version,jdbcType=BIGINT},
+      </if>
+      <if test="record.merkleroot != null" >
+        merkleroot = #{record.merkleroot,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mint != null" >
+        mint = #{record.mint,jdbcType=DECIMAL},
+      </if>
+      <if test="record.time != null" >
+        time = #{record.time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.nonce != null" >
+        nonce = #{record.nonce,jdbcType=BIGINT},
+      </if>
+      <if test="record.bits != null" >
+        bits = #{record.bits,jdbcType=VARCHAR},
+      </if>
+      <if test="record.difficulty != null" >
+        difficulty = #{record.difficulty,jdbcType=DECIMAL},
+      </if>
+      <if test="record.blocktrust != null" >
+        blocktrust = #{record.blocktrust,jdbcType=VARCHAR},
+      </if>
+      <if test="record.chaintrust != null" >
+        chaintrust = #{record.chaintrust,jdbcType=VARCHAR},
+      </if>
+      <if test="record.previousblockhash != null" >
+        previousblockhash = #{record.previousblockhash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nextblockhash != null" >
+        nextblockhash = #{record.nextblockhash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.flags != null" >
+        flags = #{record.flags,jdbcType=VARCHAR},
+      </if>
+      <if test="record.proofhash != null" >
+        proofhash = #{record.proofhash,jdbcType=VARCHAR},
+      </if>
+      <if test="record.entropybit != null" >
+        entropybit = #{record.entropybit,jdbcType=BIGINT},
+      </if>
+      <if test="record.modifier != null" >
+        modifier = #{record.modifier,jdbcType=VARCHAR},
+      </if>
+      <if test="record.modifierv2 != null" >
+        modifierv2 = #{record.modifierv2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.signature != null" >
+        signature = #{record.signature,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update hsr_block
+    set hash = #{record.hash,jdbcType=VARCHAR},
+      confirmations = #{record.confirmations,jdbcType=BIGINT},
+      size = #{record.size,jdbcType=BIGINT},
+      height = #{record.height,jdbcType=BIGINT},
+      version = #{record.version,jdbcType=BIGINT},
+      merkleroot = #{record.merkleroot,jdbcType=VARCHAR},
+      mint = #{record.mint,jdbcType=DECIMAL},
+      time = #{record.time,jdbcType=TIMESTAMP},
+      nonce = #{record.nonce,jdbcType=BIGINT},
+      bits = #{record.bits,jdbcType=VARCHAR},
+      difficulty = #{record.difficulty,jdbcType=DECIMAL},
+      blocktrust = #{record.blocktrust,jdbcType=VARCHAR},
+      chaintrust = #{record.chaintrust,jdbcType=VARCHAR},
+      previousblockhash = #{record.previousblockhash,jdbcType=VARCHAR},
+      nextblockhash = #{record.nextblockhash,jdbcType=VARCHAR},
+      flags = #{record.flags,jdbcType=VARCHAR},
+      proofhash = #{record.proofhash,jdbcType=VARCHAR},
+      entropybit = #{record.entropybit,jdbcType=BIGINT},
+      modifier = #{record.modifier,jdbcType=VARCHAR},
+      modifierv2 = #{record.modifierv2,jdbcType=VARCHAR},
+      signature = #{record.signature,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.maolian.entity.HsrBlock" >
+    update hsr_block
+    <set >
+      <if test="confirmations != null" >
+        confirmations = #{confirmations,jdbcType=BIGINT},
+      </if>
+      <if test="size != null" >
+        size = #{size,jdbcType=BIGINT},
+      </if>
+      <if test="height != null" >
+        height = #{height,jdbcType=BIGINT},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=BIGINT},
+      </if>
+      <if test="merkleroot != null" >
+        merkleroot = #{merkleroot,jdbcType=VARCHAR},
+      </if>
+      <if test="mint != null" >
+        mint = #{mint,jdbcType=DECIMAL},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="nonce != null" >
+        nonce = #{nonce,jdbcType=BIGINT},
+      </if>
+      <if test="bits != null" >
+        bits = #{bits,jdbcType=VARCHAR},
+      </if>
+      <if test="difficulty != null" >
+        difficulty = #{difficulty,jdbcType=DECIMAL},
+      </if>
+      <if test="blocktrust != null" >
+        blocktrust = #{blocktrust,jdbcType=VARCHAR},
+      </if>
+      <if test="chaintrust != null" >
+        chaintrust = #{chaintrust,jdbcType=VARCHAR},
+      </if>
+      <if test="previousblockhash != null" >
+        previousblockhash = #{previousblockhash,jdbcType=VARCHAR},
+      </if>
+      <if test="nextblockhash != null" >
+        nextblockhash = #{nextblockhash,jdbcType=VARCHAR},
+      </if>
+      <if test="flags != null" >
+        flags = #{flags,jdbcType=VARCHAR},
+      </if>
+      <if test="proofhash != null" >
+        proofhash = #{proofhash,jdbcType=VARCHAR},
+      </if>
+      <if test="entropybit != null" >
+        entropybit = #{entropybit,jdbcType=BIGINT},
+      </if>
+      <if test="modifier != null" >
+        modifier = #{modifier,jdbcType=VARCHAR},
+      </if>
+      <if test="modifierv2 != null" >
+        modifierv2 = #{modifierv2,jdbcType=VARCHAR},
+      </if>
+      <if test="signature != null" >
+        signature = #{signature,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where hash = #{hash,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.maolian.entity.HsrBlock" >
+    update hsr_block
+    set confirmations = #{confirmations,jdbcType=BIGINT},
+      size = #{size,jdbcType=BIGINT},
+      height = #{height,jdbcType=BIGINT},
+      version = #{version,jdbcType=BIGINT},
+      merkleroot = #{merkleroot,jdbcType=VARCHAR},
+      mint = #{mint,jdbcType=DECIMAL},
+      time = #{time,jdbcType=TIMESTAMP},
+      nonce = #{nonce,jdbcType=BIGINT},
+      bits = #{bits,jdbcType=VARCHAR},
+      difficulty = #{difficulty,jdbcType=DECIMAL},
+      blocktrust = #{blocktrust,jdbcType=VARCHAR},
+      chaintrust = #{chaintrust,jdbcType=VARCHAR},
+      previousblockhash = #{previousblockhash,jdbcType=VARCHAR},
+      nextblockhash = #{nextblockhash,jdbcType=VARCHAR},
+      flags = #{flags,jdbcType=VARCHAR},
+      proofhash = #{proofhash,jdbcType=VARCHAR},
+      entropybit = #{entropybit,jdbcType=BIGINT},
+      modifier = #{modifier,jdbcType=VARCHAR},
+      modifierv2 = #{modifierv2,jdbcType=VARCHAR},
+      signature = #{signature,jdbcType=VARCHAR}
+    where hash = #{hash,jdbcType=VARCHAR}
+  </update>
+</mapper>

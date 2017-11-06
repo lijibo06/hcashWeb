@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="hcashWeb:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="hcashWeb.war">
+      <element id="artifact" artifact-name="hcashWeb:war exploded" />
+    </root>
+  </artifact>
+</component>

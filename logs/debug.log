@@ -1,0 +1,15 @@
+2017-11-02 17:11:48,653 INFO[org.springframework.web.servlet.DispatcherServlet:488] - FrameworkServlet 'spring-dispatcher': initialization started
+2017-11-02 17:11:48,669 INFO[org.springframework.web.context.support.XmlWebApplicationContext:573] - Refreshing WebApplicationContext for namespace 'spring-dispatcher-servlet': startup date [Thu Nov 02 17:11:48 CST 2017]; root of context hierarchy
+2017-11-02 17:11:48,694 INFO[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:317] - Loading XML bean definitions from file [F:\workspace\hcashWeb\target\classes\spring\spring-dao.xml]
+2017-11-02 17:11:48,787 INFO[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:317] - Loading XML bean definitions from file [F:\workspace\hcashWeb\target\classes\spring\spring-web.xml]
+2017-11-02 17:11:48,980 WARN[org.mybatis.spring.mapper.ClassPathMapperScanner:167] - No MyBatis mapper was found in '[com.maolian.dao]' package. Please check your configuration.
+2017-11-02 17:11:48,987 INFO[org.springframework.context.support.PropertySourcesPlaceholderConfigurer:172] - Loading properties file from class path resource [jdbc.properties]
+2017-11-02 17:11:48,994 INFO[org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor:153] - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+2017-11-02 17:11:49,731 INFO[com.alibaba.druid.pool.DruidDataSource:722] - {dataSource-1} inited
+2017-11-02 17:11:50,164 INFO[org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping:532] - Mapped "{[/block/test],methods=[GET]}" onto public java.lang.String com.maolian.action.HsrBlockAction.test()
+2017-11-02 17:11:50,382 INFO[org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter:532] - Looking for @ControllerAdvice: WebApplicationContext for namespace 'spring-dispatcher-servlet': startup date [Thu Nov 02 17:11:48 CST 2017]; root of context hierarchy
+2017-11-02 17:11:50,419 INFO[org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter:532] - Looking for @ControllerAdvice: WebApplicationContext for namespace 'spring-dispatcher-servlet': startup date [Thu Nov 02 17:11:48 CST 2017]; root of context hierarchy
+2017-11-02 17:11:50,459 INFO[org.springframework.web.servlet.handler.SimpleUrlHandlerMapping:341] - Mapped URL path [/**] onto handler 'org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler#0'
+2017-11-02 17:11:50,469 INFO[org.springframework.web.servlet.handler.SimpleUrlHandlerMapping:341] - Mapped URL path [/statics/**] onto handler 'org.springframework.web.servlet.resource.ResourceHttpRequestHandler#0'
+2017-11-02 17:11:50,476 INFO[org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor:165] - Initializing ExecutorService  'taskExecutor'
+2017-11-02 17:11:50,527 INFO[org.springframework.web.servlet.DispatcherServlet:507] - FrameworkServlet 'spring-dispatcher': initialization completed in 1872 ms
